@@ -32,8 +32,9 @@
     "test:watch": "jest --watch",
     "lint": "tsc --noEmit -p tsconfig.test.json && prettier --check .",
     "format": "prettier --write .",
-    "validate": "npm run build && zapier validate",
-    "push": "zapier push"
+    "validate": "zapier-platform validate",
+    "push": "zapier-platform push",
+    "register": "zapier-platform register"
   },
   "dependencies": {
     "form-data": "^4.0.5",
