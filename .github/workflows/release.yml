@@ -1,0 +1,29 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  push:
+    name: Push to Zapier
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # Zapier runs platform v19 integrations on Node 22.
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm test
+
+      # `zapier push` builds through the `_zapier-build` script, then uploads a
+      # new private version. Promoting it to users is a separate manual step.
+      - name: Push a new integration version
+        env:
+          ZAPIER_DEPLOY_KEY: ${{ secrets.ZAPIER_DEPLOY_KEY }}
+        run: npx zapier-platform push
