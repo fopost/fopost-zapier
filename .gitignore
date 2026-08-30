@@ -1,0 +1,14 @@
+node_modules/
+build/
+dist/
+coverage/
+.env
+.environment
+*.log
+npm-debug.log*
+.DS_Store
+.idea/
+.vscode/
+
+# NOTE: .zapierapprc is intentionally NOT ignored. It holds the Zapier app id,
+# which is not a secret, and every contributor needs it to push to the same app.
