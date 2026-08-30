@@ -11,18 +11,7 @@ module.exports = {
     '^(\\.{1,2}/.*)\\.js$': '$1',
   },
   transform: {
-    '^.+\\.ts$': [
-      'ts-jest',
-      {
-        tsconfig: {
-          module: 'CommonJS',
-          moduleResolution: 'node',
-          esModuleInterop: true,
-          target: 'ES2022',
-          verbatimModuleSyntax: false,
-        },
-      },
-    ],
+    '^.+\\.ts$': ['ts-jest', { tsconfig: 'tsconfig.jest.json' }],
   },
   clearMocks: true,
   testTimeout: 20000,
