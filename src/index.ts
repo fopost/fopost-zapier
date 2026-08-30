@@ -10,6 +10,7 @@ import { findAccount } from './searches/find_account.js';
 import { findPost } from './searches/find_post.js';
 import { listAccounts } from './triggers/list_accounts.js';
 import { listLabels } from './triggers/list_labels.js';
+import { listPosts } from './triggers/list_posts.js';
 import { listWorkspaces } from './triggers/list_workspaces.js';
 import { newAccountConnected } from './triggers/new_account_connected.js';
 import { newPostPublished } from './triggers/new_post_published.js';
@@ -24,6 +25,15 @@ export default defineApp({
   beforeRequest: [includeApiKey],
   afterResponse: [handleErrors],
 
+  flags: {
+    // Core throws its own generic ThrottledError on a 429 before afterResponse
+    // runs. Turning that off lets handleErrors report FoPost's own wording.
+    throwForThrottlingEarly: false,
+    // Every perform treats an empty string as absent, so Zapier's input
+    // scrubbing only makes what reaches the API harder to predict.
+    cleanInputData: false,
+  },
+
   triggers: {
     [newPostPublished.key]: newPostPublished,
     [postFailed.key]: postFailed,
@@ -31,6 +41,7 @@ export default defineApp({
     [listWorkspaces.key]: listWorkspaces,
     [listAccounts.key]: listAccounts,
     [listLabels.key]: listLabels,
+    [listPosts.key]: listPosts,
   },
 
   creates: {

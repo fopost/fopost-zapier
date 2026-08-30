@@ -43,10 +43,11 @@ export const publishPost: Create = {
     inputFields: [
       {
         key: 'post_id',
-        label: 'Post ID',
+        label: 'Post',
         type: 'string',
+        dynamic: 'list_posts.id.name',
         required: true,
-        helpText: 'The ID returned by Create Post, or found with Find Post.',
+        helpText: 'Pick a draft or scheduled post, or map an ID from an earlier step.',
       },
       {
         key: 'account_ids',

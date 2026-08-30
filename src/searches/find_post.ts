@@ -39,8 +39,9 @@ export const findPost: Search = {
     inputFields: [
       {
         key: 'post_id',
-        label: 'Post ID',
+        label: 'Post',
         type: 'string',
+        dynamic: 'list_posts.id.name',
         required: false,
         helpText: 'Look up one exact post. Every other field is ignored when this is set.',
       },
@@ -57,6 +58,7 @@ export const findPost: Search = {
         label: 'Status',
         type: 'string',
         required: false,
+        altersDynamicFields: true,
         choices: {
           draft: 'Draft',
           scheduled: 'Scheduled',

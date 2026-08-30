@@ -55,8 +55,9 @@ export const authentication: Authentication = {
       type: 'password',
       required: true,
       helpText:
-        'Create an API key in FoPost under Settings → API Keys. Give it the `workspaces`, ' +
-        '`accounts`, `posts` and `labels` scopes so every trigger and action works.',
+        'Create an API key in FoPost under Settings → API Keys, and give it the `workspaces`, ' +
+        '`accounts`, `posts` and `labels` scopes so every trigger and action works. ' +
+        'Full instructions are at https://fopost.com/docs.',
     },
   ],
 };
