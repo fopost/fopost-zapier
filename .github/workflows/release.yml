@@ -23,8 +23,9 @@ jobs:
 
       # `zapier push` builds through the `_zapier-build` script, then uploads a
       # new private version. Promoting it to users is a separate manual step.
-      # Zapier requires a new app to bootstrap at 0.0.x before any 0.1.0+
-      # version is accepted, so the first tag on a fresh app is v0.0.1.
+      # Zapier requires a brand-new app's first upload to be exactly 0.0.0.
+      # Anything higher is refused until it exists, so a fresh app starts at
+      # v0.0.0 and the next release can resume normal versioning.
       - name: Push a new integration version
         env:
           ZAPIER_DEPLOY_KEY: ${{ secrets.ZAPIER_DEPLOY_KEY }}

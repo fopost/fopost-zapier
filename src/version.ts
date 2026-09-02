@@ -4,4 +4,4 @@
  *
  * Kept equal to package.json — definition.test.ts fails if the two drift.
  */
-export const version = '0.0.1';
+export const version = '0.0.0';
