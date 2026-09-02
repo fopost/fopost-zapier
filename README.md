@@ -5,7 +5,7 @@
 [![Zapier Platform](https://img.shields.io/badge/zapier--platform-19-orange.svg)](https://docs.zapier.com/platform)
 
 The official [FoPost](https://fopost.com) integration for Zapier. It connects FoPost
-scheduling and publishing — 30+ social networks from one composer — to everything else in
+scheduling and publishing — every connected network from one composer — to everything else in
 your Zapier account: draft a post when a row lands in a sheet, publish when a deal closes,
 alert the team the moment a delivery fails.
 
@@ -57,22 +57,21 @@ as the API asks.
 
 ## Installing as a private app
 
-You do not need to wait for the public listing. Anyone with a Zapier account can run this
-integration privately:
+You do not need to wait for the public listing. Open the invite link, and the FoPost
+triggers and actions appear in your Zap editor straight away:
 
-```bash
-git clone https://github.com/fopost/fopost-zapier.git
-cd fopost-zapier
-npm install
+**https://zapier.com/developer/public-invite/245788/97efdb1a56eae2dbebd9a79b0ecca1d0/**
 
-npx zapier-platform login      # once, with your Zapier account
-npx zapier-platform register   # once, creates the app and writes .zapierapprc
-npx zapier-platform push       # builds and uploads a version
-```
+Zapier will ask for a FoPost API key. Create one at
+[fopost.com/dashboard/settings/api-keys](https://fopost.com/dashboard/settings/api-keys)
+with the `posts`, `accounts` and `workspaces` scopes.
 
-`zapier push` prints an invite link. Open it, connect your FoPost API key, and the triggers
-and actions show up in the Zap editor. Anyone you share that link with can use the same
-private version.
+That link runs the same published version this repository builds — it is a private
+listing, not a preview build, so nothing here needs cloning or pushing to use it.
+
+The integration is not yet in Zapier's public App Directory. Zapier requires at least
+three separate accounts running live Zaps before an integration can be listed, so the
+invite link is how it reaches people until then.
 
 ## Development
 
