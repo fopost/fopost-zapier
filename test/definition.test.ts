@@ -25,3 +25,12 @@ describe('app definition', () => {
     }
   });
 });
+
+describe('version', () => {
+  it('matches package.json, which is the version Zapier records', () => {
+    // A mismatch is invisible until Zapier rejects the upload, because the
+    // app definition takes its version from src/version.ts, not package.json.
+    const pkg = require('../package.json') as { version: string };
+    expect(App.version).toBe(pkg.version);
+  });
+});
