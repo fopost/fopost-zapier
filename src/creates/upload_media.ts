@@ -1,11 +1,10 @@
-import FormData from 'form-data';
 import type { Create, CreatePerform } from 'zapier-platform-core';
 
-import { apiUrl, unwrap } from '../lib/api.js';
+import { post } from '../lib/api.js';
 import { workspaceField } from '../lib/fields.js';
 import { uploadedMediaOutputFields } from '../lib/outputs.js';
 import { uploadedMediaSample } from '../lib/samples.js';
-import type { UploadedMedia } from '../lib/types.js';
+import type { PresignedUpload, UploadedMedia } from '../lib/types.js';
 
 const filenameFrom = (disposition: string | undefined, url: string): string => {
   const match = disposition?.match(/filename\*?=(?:UTF-8'')?"?([^";]+)"?/i);
@@ -20,31 +19,32 @@ const perform: CreatePerform<Record<string, unknown>, UploadedMedia> = async (z,
 
   // Zapier hands us either a URL or a hydrated file pointer; both are fetchable.
   const file = await z.request({ url: fileUrl, raw: true });
+  const bytes = await file.buffer();
   const filename =
     (bundle.inputData.filename as string) ||
     filenameFrom(file.getHeader('content-disposition'), fileUrl);
+  const mimeType = file.getHeader('content-type') || 'application/octet-stream';
 
-  const form = new FormData();
-  form.append('files', file.body, {
+  const presigned = await post<PresignedUpload>(z, '/media/presign', {
+    workspaceId: workspaceId || undefined,
     filename,
-    contentType: file.getHeader('content-type') || undefined,
-  });
-  if (workspaceId) {
-    form.append('workspaceId', workspaceId);
-  }
-
-  const response = await z.request({
-    url: apiUrl('/media/upload'),
-    method: 'POST',
-    body: form,
-    headers: form.getHeaders(),
+    mimeType,
+    size: bytes.length,
   });
 
-  const uploaded = unwrap<UploadedMedia[]>(response.data);
-  if (!uploaded || uploaded.length === 0) {
+  // The signed URL is not a FoPost host, so the middleware never attaches the API key.
+  await z.request({
+    url: presigned.uploadUrl,
+    method: presigned.method,
+    headers: presigned.headers,
+    body: bytes,
+  });
+
+  const uploaded = await post<UploadedMedia>(z, `/media/presign/${presigned.uploadId}/complete`);
+  if (!uploaded || !uploaded.url) {
     throw new z.errors.Error('FoPost accepted the upload but returned no media.', 'no_media', 502);
   }
-  return uploaded[0];
+  return uploaded;
 };
 
 export const uploadMedia: Create = {

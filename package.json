@@ -37,7 +37,6 @@
     "register": "zapier-platform register"
   },
   "dependencies": {
-    "form-data": "^4.0.5",
     "zapier-platform-core": "19.1.0"
   },
   "devDependencies": {

@@ -69,8 +69,20 @@ describe('error middleware', () => {
         return [200, 'binary-bytes', { 'content-type': 'image/jpeg' }];
       });
     nock(API)
-      .post('/v1/media/upload')
-      .reply(201, { data: [{ type: 'image', name: 'photo.jpg', url: `${API}/f/1`, size: 12 }] });
+      .post('/v1/media/presign')
+      .reply(200, {
+        data: {
+          uploadId: 'up_1',
+          uploadUrl: 'https://uploads.example-storage.com/staging/up_1',
+          method: 'PUT',
+          headers: { 'Content-Type': 'image/jpeg' },
+          expiresAt: '2026-09-19T12:00:00.000Z',
+        },
+      });
+    nock('https://uploads.example-storage.com').put('/staging/up_1').reply(200, '');
+    nock(API)
+      .post('/v1/media/presign/up_1/complete')
+      .reply(201, { data: { type: 'image', name: 'photo.jpg', url: `${API}/f/1`, size: 12 } });
 
     await appTester(operationPerform(App.creates.upload_media.operation), {
       ...AUTH,

@@ -143,3 +143,11 @@ export interface UploadedMedia {
   url: string;
   size: number;
 }
+
+export interface PresignedUpload {
+  uploadId: string;
+  uploadUrl: string;
+  method: 'PUT';
+  headers: Record<string, string>;
+  expiresAt: string;
+}

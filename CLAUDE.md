@@ -60,7 +60,8 @@ error mapping below. Do not "simplify" this by adding the SDK.
 
 - `includeApiKey` adds `X-API-Key`, `Accept` and a `fopost-zapier/<version>` User-Agent, and
   is **scoped to the FoPost host** — `upload_media` fetches the user's file from a
-  third-party URL through the same `z.request`, and the key must never travel there.
+  third-party URL and PUTs the bytes to a signed storage URL through the same `z.request`,
+  and the key must never travel to either.
 - `handleErrors` maps the `{ error, message }` envelope: `401` → `ExpiredAuthError` (Zapier
   prompts a reconnect), `429` → `ThrottledError` honouring `Retry-After`, `402` → an error
   carrying `upgrade_url`, everything else → `z.errors.Error` with the API's own message.
@@ -97,6 +98,9 @@ either — the same structural check `zapier validate` runs, kept in CI.
 - Retries and backoff are Zapier's job, not ours. Do not add a retry loop.
 - Publishing is create-then-publish, and `POST /posts/{id}/publish` returns when delivery is
   **queued**, not live.
+- Media upload is a direct upload, never multipart: `POST /media/presign` answers a signed
+  `uploadUrl` plus the exact headers to send, the bytes go there with `PUT` and no API key,
+  and `POST /media/presign/{uploadId}/complete` returns the stored media. Max 50 MB.
 
 ## Commands
 
