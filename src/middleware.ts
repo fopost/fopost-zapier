@@ -11,9 +11,9 @@ interface ErrorEnvelope {
 }
 
 /**
- * Uploads fetch the user's file from a third-party URL through the same
- * `z.request`, so neither the API key nor FoPost error handling may leak onto
- * a host that is not ours.
+ * Uploads fetch the user's file from a third-party URL and PUT it to a signed
+ * storage URL through the same `z.request`, so neither the API key nor FoPost
+ * error handling may leak onto a host that is not ours.
  */
 const isFoPostRequest = (url?: string): boolean => {
   if (!url) return false;
