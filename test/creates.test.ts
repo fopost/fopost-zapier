@@ -6,6 +6,7 @@ import {
   account,
   API,
   AUTH,
+  headerValue,
   label,
   operationPerform,
   publishedPost,
@@ -183,22 +184,50 @@ describe('add_label', () => {
 describe('upload_media', () => {
   afterEach(resetHttp);
 
-  it('uploads the fetched file as multipart and returns the stored media', async () => {
-    let contentType: string | undefined;
+  it('presigns, PUTs the raw bytes without the API key, then completes', async () => {
+    let presignBody: Record<string, unknown> | undefined;
+    let putBody: string | undefined;
+    let putContentType: string | undefined;
+    let putApiKey: string | undefined;
+    let completed = false;
 
     nock('https://files.zapier.com')
       .get('/download/roast.jpg')
       .reply(200, 'binary-bytes', { 'content-type': 'image/jpeg' });
 
     nock(API)
-      .post('/v1/media/upload', (body) => typeof body === 'string' && body.includes('roast.jpg'))
+      .post('/v1/media/presign', (body) => {
+        presignBody = body;
+        return true;
+      })
+      .reply(200, {
+        data: {
+          uploadId: 'up_1',
+          uploadUrl: 'https://uploads.example-storage.com/staging/up_1?sig=abc',
+          method: 'PUT',
+          headers: { 'Content-Type': 'image/jpeg' },
+          expiresAt: '2026-09-19T12:00:00.000Z',
+        },
+      });
+
+    nock('https://uploads.example-storage.com')
+      .put('/staging/up_1?sig=abc', (body) => {
+        putBody = body;
+        return true;
+      })
       .reply(function () {
-        contentType = ([] as string[]).concat(this.req.getHeader('content-type') as never)[0];
+        putContentType = headerValue(this.req.getHeader('content-type'));
+        putApiKey = headerValue(this.req.getHeader('x-api-key'));
+        return [200, ''];
+      });
+
+    nock(API)
+      .post('/v1/media/presign/up_1/complete')
+      .reply(function () {
+        completed = true;
         return [
           201,
-          {
-            data: [{ id: 'm1', type: 'image', name: 'roast.jpg', url: `${API}/f/m1`, size: 13 }],
-          },
+          { data: { id: 'm1', type: 'image', name: 'roast.jpg', url: `${API}/f/m1`, size: 12 } },
         ];
       });
 
@@ -207,7 +236,16 @@ describe('upload_media', () => {
       workspace_id: workspace.id,
     })) as Record<string, unknown>;
 
-    expect(contentType).toMatch(/^multipart\/form-data; boundary=/);
+    expect(presignBody).toEqual({
+      workspaceId: workspace.id,
+      filename: 'roast.jpg',
+      mimeType: 'image/jpeg',
+      size: 12,
+    });
+    expect(putBody).toBe('binary-bytes');
+    expect(putContentType).toBe('image/jpeg');
+    expect(putApiKey).toBeUndefined();
+    expect(completed).toBe(true);
     expect(uploaded).toMatchObject({ id: 'm1', name: 'roast.jpg' });
   });
 });
