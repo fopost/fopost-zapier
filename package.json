@@ -37,7 +37,7 @@
     "register": "zapier-platform register"
   },
   "dependencies": {
-    "zapier-platform-core": "19.1.0"
+    "zapier-platform-core": "19.3.0"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
@@ -47,10 +47,14 @@
     "prettier": "^3.4.2",
     "ts-jest": "^29.2.5",
     "typescript": "^5.7.0",
-    "zapier-platform-cli": "^19.1.0"
+    "zapier-platform-cli": "^19.3.0"
   },
   "engines": {
     "node": ">=20",
     "npm": ">=10.7.0"
+  },
+  "overrides": {
+    "brace-expansion@1": "1.1.21",
+    "tmp": "0.2.7"
   }
 }
